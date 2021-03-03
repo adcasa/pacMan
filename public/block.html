@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <SCRIPT>
+            var flag = 1,
+                pos = 0,
+                posG = 0,
+                img = null,
+                imgG = null,
+                url = 'http://localhost:3000'; // change this to IP address of server
+
+                const pacArray = [
+                    ['1', '2'],
+                    ['3', '4']
+                ];
+                const ghostArray = [
+                    ['1', '1'],
+                    ['2', '2']
+                ];
+                var direction = 0;
+                var directionG = 0;
+                var focus = 0;
+
+            function Run() {
+                img = document.getElementById("PacMan");
+                imgG = document.getElementById("Ghost");
+                posG = parseInt(imgG.style.left,10);
+                let imgWidth = img.width
+                let imgGWidth = imgG.width
+                focus = (focus + 1) % 2;
+                direction = checkPageBounds(direction, imgWidth);
+                directionG = checkPageBoundsG(directionG, imgGWidth);
+                let tpimg = pacArray[direction][focus];
+                let tpimgG = ghostArray[directionG][focus];
+                if (direction) {
+                    img.src = url + '/pac?id=' + tpimg;
+                    imgG.src = url + '/ghost?id=' + tpimgG;
+                    pos -= 20;
+                    posG -= 20;
+                    img.style.left = pos + "px";
+                    imgG.style.left = posG + "px";
+                } else {
+                    img.src = url + '/pac?id=' + tpimg;
+                    imgG.src = url + '/ghost?id=' + tpimgG;
+                    pos += 20;
+                    posG += 20;
+                    img.style.left = pos + 'px';
+                    imgG.style.left = posG + "px";
+                }
+
+                fetch(url + '/set?x=' + pos);
+                setTimeout(Run, 200);
+            }
+
+            function checkPageBounds(direction, imgWidth) {
+                let pageWidth = window.innerWidth;
+                if (direction == 0 && (pos+400) + imgWidth > pageWidth) direction = 1;
+                if (direction == 1 && pos < 0) direction = 0;
+            return direction;
+        }
+
+        function checkPageBoundsG(directionG, imgGWidth) {
+                let pageWidth = window.innerWidth;
+                if (directionG == 0 && posG + imgGWidth > (pageWidth-150)) directionG = 1;
+                if (directionG == 1 && posG < 400) directionG = 0;
+            return directionG;
+        }
+
+        </SCRIPT>
+    </head>
+    <body>
+        <p>Click on PacMan and the position will be sent to the server".</p>
+        <img id="Ghost" src='http://localhost:3000/ghost?id=1' style="position: absolute; top: 100px; left: 400px;">
+        <img id="PacMan" src='http://localhost:3000/pac?id=2' onclick="Run()" style="position:absolute">
+    </body>
+</html>
